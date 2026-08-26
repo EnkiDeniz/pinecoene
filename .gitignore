@@ -1,0 +1,14 @@
+.vercel
+.next
+.pnpm-store
+node_modules
+playwright-report
+test-results
+coverage
+.DS_Store
+.env*
+!.env.example
+concept/
+npm-debug.log*
+pnpm-debug.log*
+*.tsbuildinfo
