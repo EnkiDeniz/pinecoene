@@ -89,7 +89,7 @@ export function StudioInstrument({
   studyId?: string;
   guided?: boolean;
 }) {
-  const [mode, setMode] = useState<StudioMode>(guided ? "record" : "fold");
+  const [mode, setMode] = useState<StudioMode>("record");
   const [artifact, setArtifact] = useState(initialArtifact);
   const [decisions, setDecisions] = useState(() => cloneDecisions(defaultDecisions(initialArtifact.manifest)));
   const [currentStudy, setCurrentStudy] = useState<SessionStudyV0_1>();
@@ -226,9 +226,9 @@ export function StudioInstrument({
   return (
     <main className={`studioInstrument ${mode === "becoming" ? "isBecoming" : ""}`}>
       <header className="instrumentTopbar studioTopbar">
-        <Link className="instrumentBrand" href="/studio"><ArrowLeft aria-hidden="true" /> Pinecœne <span>{guided ? "Guided Study" : "Studio"}</span></Link>
+        <Link className="instrumentBrand" href="/sketches"><ArrowLeft aria-hidden="true" /> Pinecœne <span>{guided ? "Guided Study" : "Sketch"}</span></Link>
         <div className="artifactIdentity"><strong>{artifact.manifest.fixtureId}</strong><span>{artifact.manifest.title} · {currentStudy ? "PROTOTYPE-ONLY FORK" : "IMMUTABLE FIXTURE"}</span></div>
-        <nav aria-label="Studio utilities"><button onClick={() => setSoundOn((value) => !value)} aria-pressed={soundOn}>{soundOn ? <SpeakerHigh aria-hidden="true" /> : <SpeakerSlash aria-hidden="true" />} Sound {soundOn ? "on" : "off"}</button><Link href="/vital-sign">Vital Sign <sup>EXP</sup></Link></nav>
+        <nav aria-label="Studio utilities"><button onClick={() => setSoundOn((value) => !value)} aria-pressed={soundOn}>{soundOn ? <SpeakerHigh aria-hidden="true" /> : <SpeakerSlash aria-hidden="true" />} Sound {soundOn ? "on" : "off"}</button><Link href="/sketches/vital-sign">Vital Sign <sup>EXP</sup></Link></nav>
       </header>
       <div className="studioModeRail" role="tablist" aria-label="Studio modes">
         {(guided ? MODES.filter((item) => GUIDED_MODES.includes(item.id)) : MODES).map((item) => <button key={item.id} role="tab" aria-selected={mode === item.id} onClick={() => setMode(item.id)}>{item.label}</button>)}
@@ -266,7 +266,7 @@ export function StudioInstrument({
         </aside>
       </section>
       <footer className="studioFooter">
-        <div><span className="standingDot" /> {currentStudy ? "PROTOTYPE-ONLY SESSION FORK" : "FIXTURE-AUTHORED CANONICAL SPECIMEN"}</div>
+        <div><span className="standingDot" /> {currentStudy ? "PROTOTYPE-ONLY SESSION FORK" : "FIXTURE-AUTHORED CANONICAL SPECIMEN"} · GEOMETRY COMPILED FROM THIS FIXTURE</div>
         <div className="studioFooterActions">
           {guided ? <button className="instrumentSecondary" disabled={GUIDED_MODES.indexOf(mode) === 0} onClick={() => moveGuided(-1)}><ArrowLeft aria-hidden="true" /> Previous decision</button> : null}
           {currentStudy ? <button className="instrumentSecondary" onClick={() => downloadJson(`${currentStudy.studyId}.json`, currentStudy)}><DownloadSimple aria-hidden="true" /> Export study</button> : null}
@@ -283,7 +283,7 @@ function PanelHeading({ eyebrow, title, children }: { eyebrow: string; title: st
 }
 
 function RecordPanel({ artifact }: { artifact: CompiledStudioArtifact }) {
-  return <><PanelHeading eyebrow="GENESIS · EXACT PERMITTED RECORD" title={artifact.manifest.title}><p>{artifact.manifest.recordSummary}</p></PanelHeading><div className="inspectorSection"><h3>Source-linked events</h3><ol className="recordEvents">{artifact.manifest.events.map((event) => <li key={event.eventId}><span>{event.eventId} · P{event.phase}</span><strong>{event.exactRecord}</strong><p>{event.label}</p><small>{event.sourceAnchor}{event.uncertainty ? ` · ${event.uncertainty}` : ""}</small></li>)}</ol></div><div className="inspectorSection truthBlock"><SealCheck aria-hidden="true" /><p>{artifact.manifest.disclosure}</p></div></>;
+  return <><PanelHeading eyebrow="START WITH THE TRAIL · EXACT PERMITTED RECORD" title={artifact.manifest.title}><p>{artifact.manifest.recordSummary}</p></PanelHeading><div className="inspectorSection"><h3>Source-linked events</h3><ol className="recordEvents">{artifact.manifest.events.map((event) => <li key={event.eventId}><span>{event.eventId} · P{event.phase}</span><strong>{event.exactRecord}</strong><p>{event.label}</p><small>{event.sourceAnchor}{event.uncertainty ? ` · ${event.uncertainty}` : ""}</small></li>)}</ol></div><div className="inspectorSection truthBlock"><SealCheck aria-hidden="true" /><p><strong>Geometry compiled from this fixture.</strong> Fixture-authored deterministic simulation; it does not claim arbitrary source reading or observed human admission.</p></div><div className="inspectorSection truthBlock"><SealCheck aria-hidden="true" /><p>{artifact.manifest.disclosure}</p></div></>;
 }
 
 function AdmissionPanel({ artifact, decisions, updateEvent, updateRelation, setDecisions }: { artifact: CompiledStudioArtifact; decisions: OwnerDecisionSetV0_1; updateEvent:(id:string,value:DecisionDisposition)=>void; updateRelation:(id:string,value:DecisionDisposition)=>void; setDecisions:React.Dispatch<React.SetStateAction<OwnerDecisionSetV0_1>> }) {

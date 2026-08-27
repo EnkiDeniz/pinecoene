@@ -8,9 +8,9 @@ export function SiteHeader({ quiet = false }: { quiet?: boolean }) {
         pinecœne
       </Link>
       <nav aria-label="Primary navigation">
-        <Link href="/studio">Studio</Link>
+        <Link href="/sketches">Sketches</Link>
         <Link href="/w/pcn-0002">Offering</Link>
-        <Link className="makeLink" href="/make">
+        <Link className="makeLink" href="/use">
           New study <ArrowUpRight aria-hidden="true" weight="light" />
         </Link>
       </nav>

@@ -10,34 +10,20 @@ export const metadata: Metadata = {
     template: "%s · Pinecœne",
   },
   description:
-    "Receive, open, and make a Pinecœne: a portable relational artifact that remembers how it came to be.",
+    "Pinecœne is a receipt-bound format for inquiry: a work can preserve how it became, become a form, travel by consent, and grow without rewriting its past.",
   applicationName: "Pinecœne",
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: {
-      index: false,
-      follow: false,
-    },
-  },
+  robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     title: "Pinecœne",
-    description: "A work that remembers how it was made.",
-    images: [
-      {
-        url: "/images/locket-material-reference.png",
-        width: 1254,
-        height: 1254,
-        alt: "The luminous archival fold Locket",
-      },
-    ],
+    description: "A work that remembers how it became.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Pinecœne — a work that remembers how it became" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pinecœne",
-    description: "A work that remembers how it was made.",
-    images: ["/images/locket-material-reference.png"],
+    description: "A work that remembers how it became.",
+    images: ["/opengraph-image"],
   },
 };
 

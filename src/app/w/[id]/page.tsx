@@ -6,6 +6,7 @@ import type { FixtureId } from "@/lib/studio-contracts";
 
 export const metadata: Metadata = {
   title: "Open an Offering",
+  robots: { index:false, follow:false },
 };
 
 export default async function WitnessPage({
