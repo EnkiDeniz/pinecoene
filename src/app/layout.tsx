@@ -12,6 +12,14 @@ export const metadata: Metadata = {
   description:
     "Receive, open, and make a Pinecœne: a portable relational artifact that remembers how it came to be.",
   applicationName: "Pinecœne",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
   openGraph: {
     type: "website",
     title: "Pinecœne",
