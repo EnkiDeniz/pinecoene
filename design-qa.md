@@ -1,55 +1,69 @@
-# Pinecœne Design QA
+# Pinecœne Curated Studio V1 — Design QA
 
-**Source visual truth**
+## Source visual truth
 
-- `concept/concept 2/audit-2026-08-26/05-recipient-arrival.png`
-- `concept/concept 2/audit-2026-08-26/06-locket-opening.png`
-- `concept/concept 2/audit-2026-08-26/11-mobile-arrival.png`
-- `public/images/locket-material-reference.png`
+- `evidence/design/reference-studio-pcn-0002.png` — supplied PCN-0002 owner-instrument reference.
+- `evidence/design/reference-becoming-pcn-0001.png` — supplied immersive Becoming reference.
+- `evidence/design/curated-studio-v1-desktop-keyframes.png` — frozen five-state desktop target.
+- `evidence/design/curated-studio-v1-mobile-keyframes.png` — frozen five-state 390 × 844 target.
+- `evidence/design/reference-mobile-owner-fold.png` — normalized mobile Record-sheet crop.
 
-**Rendered implementation evidence**
+## Browser-rendered implementation evidence
 
-- `evidence/qa/implementation-desktop-arrival-v2.png`
-- `evidence/qa/implementation-desktop-opening-v2.png`
-- `evidence/qa/implementation-mobile-arrival.png`
-- `evidence/qa/comparison-board-v2.png`
+- `evidence/qa/curated-studio-v1-gateway-desktop.png`
+- `evidence/qa/curated-studio-v1-record-desktop.png`
+- `evidence/qa/curated-studio-v1-becoming-desktop.png`
+- `evidence/qa/curated-studio-v1-offering-desktop.png`
+- `evidence/qa/curated-studio-v1-record-mobile.png`
+- `evidence/qa/curated-studio-v1-comparison.png`
+- `evidence/qa/curated-studio-v1-mobile-comparison.png`
 
-**Normalization**
+## Normalization
 
-- Desktop source and implementation: 1280 × 800 CSS pixels and image pixels, device scale factor 1.
-- Mobile source and implementation: 390 × 844 CSS pixels and image pixels, device scale factor 1.
-- Compared equivalent arrival and mid-opening states. The generated 1254 × 1254 material target was object-fit inside an equal comparison frame; its square crop was not treated as a layout target.
+- Desktop source: 2488 × 1700 pixels, normalized by `object-fit: contain` inside one half of a 2400 × 1100 comparison board.
+- Desktop implementation: 1920 × 1311 CSS pixels and image pixels, Chromium, device scale factor 1, PCN-0002 Record mode at canonical rest.
+- Mobile source crop: 330 × 720 pixels from the 1680 × 944 mobile keyframe board.
+- Mobile implementation: 390 × 844 CSS pixels and image pixels, Chromium, device scale factor 1, PCN-0001 Record mode at canonical rest.
+- Mobile images were compared at equal displayed height. The source includes a device bezel while the implementation is an unframed viewport; bezel and status-bar differences were excluded.
 
-## Full-view comparison
+## Full-view comparison evidence
 
-The final comparison board places Concept 2 beside the coded implementation at identical desktop dimensions, then compares the generated archival-material target and the mobile arrival. The implementation preserves the source journey and authority hierarchy: sender, closed object, dedication, one primary Open action, Not now and Decline, causal opening, and mobile-first object scale. It intentionally replaces prototype-console framing and the diagrammatic paper rosette with the selected Luminous Archival Fold language.
+`evidence/qa/curated-studio-v1-comparison.png` physically places the supplied PCN-0002 Record instrument and the browser-rendered implementation in one comparison input. Both preserve the dominant dark stage, compact owner rails, semantic object, right Record inspector, phase/provenance microtype and committed-gold / evidence-blue / OPEN-light hierarchy.
 
-## Focused comparison
+The implementation intentionally makes the renderer-neutral Bag and membrane edges more spatially explicit than the soft source cloud. This follows the accepted semantic-to-topology law: there is no ambient fog, the Core reads as committed Solid, every evidence particle is event-bound, and missing capacity is visible. This is an intentional product constraint rather than unresolved drift.
 
-- **Typography:** Newsreader preserves the source's intimate editorial voice while improving optical scale and hierarchy. Geist is limited to controls, status, and inspection. No cramped microtype remains in the recipient path.
-- **Spacing and layout:** The object, dedication, consent choices, and sound preference all fit at 1280 × 800 and 390 × 844 without horizontal overflow. Desktop and mobile retain a single centered overture rather than owner-console rails.
-- **Colors and tokens:** Near-black stage, warm paper, aged brass, and one mineral-blue recurrence match the selected direction. Semantic contrast survives sound-off, reduced-motion, and settled states.
-- **Image and material quality:** The generated material keyframe is used as the no-WebGL fallback and Open Graph art. The live object uses real Three.js geometry, physical materials, thickness, bevels, pins, raking light, and a recipient-safe deterministic seed. It remains cleaner than the photographic deckled-paper reference; this is acceptable P3 material refinement rather than a fidelity blocker.
-- **Post-protocol visual pass:** The final desktop arrival, mid-opening, and mobile evidence was recaptured after wiring the artifact seed into fold length, paper tone, pin placement, and opening variation. The seeded form preserved the approved silhouette and introduced no new P2 visual issues.
-- **Copy and content:** Recipient copy stays human-facing. Fixture standing, browser-local Return, lack of delivery, and local maker custody are explicit without introducing specification language into the overture.
-- **Icons:** Phosphor icons provide one coherent family for arrows, inspection, lock, archive, sound, and disposition actions. No handcrafted SVG, emoji, or placeholder icon art is present.
+`evidence/qa/curated-studio-v1-mobile-comparison.png` physically compares the mobile Record-sheet keyframe crop with the 390 × 844 implementation. Both use a full-stage form with a task-focused bottom sheet; no desktop side rail is compressed into the mobile frame.
+
+## Focused fidelity review
+
+- **Fonts and typography:** Newsreader carries artifact title, record and inspection voice; Geist is used for navigation and controls; monospaced type is confined to phases, hashes, anchors and timing. Hierarchy and wrapping remain legible at both target viewports. No unintended fallback or truncation was visible.
+- **Spacing and layout rhythm:** Desktop stage-to-inspector proportion follows the source instrument. The five-row grid keeps header, mode rail, optional notice, workspace and footer inside the viewport. Mobile grants the form 58svh and raises a rounded task sheet; actions stay reachable without horizontal overflow.
+- **Colors and tokens:** Near-black and charcoal surfaces, neutral rules, committed gold, event-local evidence blue and cool OPEN edges match the frozen direction. There are no gradients, neon accents or decorative galaxy particles.
+- **Image and renderer quality:** Forms are live Three.js geometry, not raster stand-ins. PCN-0001 and PCN-0002 have materially different silhouettes and anatomy. The Bag is deliberately thin, the Core has physical response, evidence remains particulate, and Muses remain peripheral. The Locket keeps its physical archival renderer. No handcrafted SVG, emoji, placeholder art or CSS-drawn product asset is used.
+- **Copy and content:** Studio, Fold, Locket, Offering, Return and Vital Sign roles are explicit. Fixture-authored, prototype-only, browser-local, experimental and deferred states are labelled. Recipient Preview and Witness describe only granted resolution.
+- **Icons and controls:** One Phosphor family is used throughout. Buttons, ranges, text inputs, selects and tabs have semantic names and visible focus.
 
 ## Comparison history
 
-1. **P2 — short desktop viewport hid secondary consent choices.** The first 1280 × 800 capture placed Not now and Decline below the fold. Fixed with a height-aware stage, smaller object maximum, compact overture rhythm, and shorter controls. The v2 capture shows all choices and sound preference.
-2. **P2 — oversized mobile grid item clipped dedication copy.** The first mobile object used a width larger than the grid track, expanding intrinsic layout while body overflow was hidden. Fixed by constraining the object to the available track and zeroing grid-item minimum width. Final measurement: `scrollWidth === clientWidth === 390`.
-3. **P2 — maker Preview inherited a wide min-content size.** The first mobile Preview clipped dedication and disclosure copy. Fixed by allowing Preview grid children to shrink and enabling safe wrapping. Final measurement: no horizontal overflow.
+1. **P1 — Locket canvas intercepted the primary Open action.** The first lifecycle run could not click **Open the Locket** because the 3D element overlapped the action row. The row received an explicit stacking context. Post-fix evidence: the complete Chromium lifecycle passes through Return and successor in 9 seconds.
+2. **P2 — absent truth notice displaced the Studio grid.** The first Becoming capture left a large empty row because conditional grid auto-placement assigned the workspace and footer to the wrong tracks. The notice row now always exists and collapses to zero height. Post-fix evidence: the final desktop Record and Becoming captures fill the intended viewport.
+3. **P2 — Vital Sign’s oversized mobile renderer created 48 px horizontal overflow.** The mobile stage now clips its intentionally oversized canvas while preserving visual scale. Post-fix measurement: every primary route reports `scrollWidth - clientWidth <= 1` at 390 × 844 in Chromium and WebKit.
+4. **P2 — source and implementation initially used different inspector states.** Evidence was recaptured in Record mode for PCN-0002 desktop and PCN-0001 mobile, then new physical side-by-side boards were rendered. Final comparisons now represent equivalent state and theme.
 
 ## Functional and accessibility evidence
 
-- Tested arrival, Open, timed opening, Skip, settled anatomy selection, Not now, Decline, Return permission controls, and local Return storage.
-- Tested sample source, deterministic reading, complete disposition, expression choice, compilation, IndexedDB save, exact Preview, and separate owner/recipient downloads.
-- Tested keyboard-semantic controls, named switches, form labels, disabled gates, live status copy, focus-visible treatment, reduced-motion behavior, sound-off default, and no-WebGL fallback content.
-- Browser console contained no application errors. Lit's development-mode advisory was present only in the development bundle.
+- Chromium: all six acceptance tests passed, including gateway → decisions → Becoming → Offering → Locket → Return → successor → Lineage.
+- Desktop WebKit passed all six tests. Mobile WebKit passed the complete lifecycle, overflow, noindex and interaction suite; its focused Vital Sign rerun also passed.
+- 390 × 844 overflow is clean on `/`, `/studio`, `/make`, both owner instruments, Encounter and Vital Sign.
+- Sound defaults off and starts only from direct gesture. Reduced motion uses explicit replay steps and disables continuous rotation. Form rotation has keyboard controls and visible focus. Return permissions have named, disabled and selected states.
+- WebGL failure returns semantic anatomy text rather than a blank stage.
+- Browser console was checked. Errors observed only during a discarded `127.0.0.1` run came from a development server configured for `localhost`; normalized `localhost` runs were clean.
 
-## Follow-up polish
+## Remaining P3 polish
 
-- P3: add scanned paper normal/roughness maps for still richer fiber and deckled-edge behavior.
-- P3: compose a fuller sonic profile after the opening rhythm is evaluated with people.
+- Increase membrane depth separation after partner evaluation if the current semantic edges feel too architectural.
+- Compose a richer optional sound score after the 84-second rhythm is reviewed with people; sound is not required for meaning in V1.
+
+No actionable P0, P1 or P2 design differences remain.
 
 **final result: passed**

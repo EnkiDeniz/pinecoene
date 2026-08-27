@@ -8,9 +8,10 @@ export function SiteHeader({ quiet = false }: { quiet?: boolean }) {
         pinecœne
       </Link>
       <nav aria-label="Primary navigation">
-        <Link href="/w/pcn-0002">Witness</Link>
+        <Link href="/studio">Studio</Link>
+        <Link href="/w/pcn-0002">Offering</Link>
         <Link className="makeLink" href="/make">
-          Make your own <ArrowUpRight aria-hidden="true" weight="light" />
+          New study <ArrowUpRight aria-hidden="true" weight="light" />
         </Link>
       </nav>
     </header>

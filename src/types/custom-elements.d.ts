@@ -7,6 +7,14 @@ declare module "react" {
         HTMLAttributes<HTMLElement>,
         HTMLElement
       > & { ref?: Ref<HTMLElement>; seed?: string };
+      "pinecoene-form": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & { ref?: Ref<HTMLElement> };
+      "pinecoene-vital": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & { ref?: Ref<HTMLElement> };
     }
   }
 }

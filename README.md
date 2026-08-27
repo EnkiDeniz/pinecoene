@@ -1,21 +1,21 @@
-# Pinecœne
+# Pinecœne — Curated Studio V1
 
-**A work that remembers how it was made.**
+The partner-ready public demonstration of the complete Pinecœne medium:
 
-This repository contains the first public Pinecœne Showcase: one curated Flagship Encounter and a browser-local maker that turns a short exact record into a deterministic, inspectable Locket.
+`Studio → Genesis → Becoming → Fold → Expression → Offering → Locket → Encounter → Return → Successor`
 
-## What is implemented
+The Studio and executable Fold are the core product. The Locket is the downstream permission vessel.
 
-- `/` and `/w/pcn-0002` — the curated PCN-0002 receiving, opening, inspection, and local Return encounter.
-- `/make` — a standalone, model-free reader for short text, complete owner disposition, deterministic compilation, expression, exact Preview, IndexedDB custody, and separate private/recipient JSON exports.
-- Direct Three.js Locket rendering with a semantic fallback, keyboard anatomy, reduced motion, and sound off by default.
-- Versioned source, candidate, admission, score, expression, Offering, and owner-archive contracts with canonical JSON, SHA-256, and Ajv boundary validation.
+## Public routes
 
-## Truth boundary
+- `/` Studio-led gateway
+- `/studio` canonical artifact shelf and browser-local studies
+- `/make` guided fixture fork
+- `/studio/pcn-0001` and `/studio/pcn-0002` owner instruments
+- `/w/[offeringId]` recipient Encounter
+- `/vital-sign` clearly labelled experimental seven Presence study
 
-The flagship is curated fixture content. The maker is a browser-local prototype. Neither path proves identity, authorship, rights, external truth, consent, delivery, human acceptance, release, Seal, or Œdit synchronization.
-
-There is no account, database, relay, analytics, or live model route. Maker source remains on the current device unless the owner downloads it.
+This release is a sanitized, `noindex` curated demonstration. It has no accounts, cloud custody, arbitrary uploads, live AI reader, remote delivery or live Œdit integration. All saved studies, Offerings, Returns, dispositions and successors are browser-local simulations.
 
 ## Development
 
@@ -38,8 +38,9 @@ The intended runtime is Node.js 20–24. Deployment is linked to the `pinecoene`
 
 ## Design and protocol sources
 
-- `Pinecœne System Specification v0.6.md`
-- `Pinecœne Design and Development Approach v0.2.md`
+- `Pinecœne Curated Studio V1 Implementation Specification v0.1.md`
+- `Pinecœne System Specification v0.6.md` — underlying medium specification
+- `Pinecœne Design and Development Approach v0.3.md`
 - `design-qa.md`
 
-Raw local concept exports are deliberately excluded from the public repository. The final generated material reference lives at `public/images/locket-material-reference.png` and is used as the no-WebGL fallback and social preview.
+Raw local concept exports are deliberately excluded from the public repository. Exact implementation keyframes are preserved in `evidence/design/`; the archival Locket material reference remains in `public/images/`.
