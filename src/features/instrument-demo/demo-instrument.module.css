@@ -1,0 +1,944 @@
+.player {
+  --demo-ground: #070809;
+  --demo-raised: #0c0d0f;
+  --demo-paper: #e3ded5;
+  --demo-paper-soft: #aaa69f;
+  --demo-paper-dim: #838285;
+  --demo-rule: rgba(218, 214, 205, 0.15);
+  --demo-rule-strong: rgba(218, 214, 205, 0.32);
+  --demo-gold: #c49658;
+  --demo-gold-bright: #e1bd82;
+  --demo-blue: #67a2df;
+  --demo-open: #a9c9e8;
+  --demo-withheld: #8f8580;
+  background: var(--demo-ground);
+  border: 1px solid var(--demo-rule);
+  color: var(--demo-paper);
+  font-family: var(--sans, "Geist Variable", Inter, system-ui, sans-serif);
+  min-width: 0;
+}
+
+.player,
+.player * {
+  box-sizing: border-box;
+}
+
+.player button {
+  font: inherit;
+}
+
+.player button:focus-visible,
+.player [tabindex]:focus-visible {
+  outline: 1px solid var(--demo-paper);
+  outline-offset: 3px;
+}
+
+.identityBar {
+  align-items: start;
+  border-bottom: 1px solid var(--demo-rule);
+  display: flex;
+  gap: 32px;
+  justify-content: space-between;
+  min-height: 112px;
+  padding: 20px 24px;
+}
+
+.identityCopy {
+  min-width: 0;
+}
+
+.kicker {
+  color: var(--demo-paper-dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+  font-weight: 620;
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.identityCopy h2 {
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: clamp(31px, 4vw, 54px);
+  font-weight: 390;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  margin: 11px 0 0;
+}
+
+.identityCopy > p:last-child {
+  color: var(--demo-paper-soft);
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 9px 0 0;
+  max-width: 680px;
+}
+
+.standingBlock {
+  align-items: end;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 260px;
+  text-align: right;
+}
+
+.standingBlock span {
+  border: 1px solid var(--demo-rule-strong);
+  color: var(--demo-paper-soft);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  padding: 7px 9px;
+  text-transform: uppercase;
+}
+
+.standingBlock span[data-standing-kind="candidate"] {
+  border-style: dashed;
+  color: #c3a598;
+}
+
+.standingBlock span[data-standing-kind="open"] {
+  border-color: rgba(169, 201, 232, 0.5);
+  color: var(--demo-open);
+}
+
+.standingBlock code {
+  color: var(--demo-paper-dim);
+  display: block;
+  font: 8px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 350px);
+  min-height: 660px;
+}
+
+.playerGrid.stageOnly {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stageOnly .stageColumn {
+  border-right: 0;
+}
+
+.stageColumn {
+  border-right: 1px solid var(--demo-rule);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.stageRegister {
+  align-items: center;
+  color: var(--demo-paper-dim);
+  display: flex;
+  font: 8px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  min-height: 38px;
+  padding: 0 16px;
+  text-transform: uppercase;
+}
+
+.stageFrame {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(196, 150, 88, 0.035), transparent 44%),
+    var(--demo-ground);
+  min-height: 510px;
+  overflow: hidden;
+  position: relative;
+}
+
+.player[data-expression-variant="art"] .stageFrame {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(205, 155, 82, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 80%, rgba(45, 94, 75, 0.09), transparent 33%),
+    #070908;
+}
+
+.stage {
+  display: block;
+  height: 100%;
+  inset: 0;
+  min-height: 510px;
+  overflow: visible;
+  position: absolute;
+  touch-action: none;
+  user-select: none;
+  width: 100%;
+}
+
+.registration {
+  fill: none;
+  opacity: 0.34;
+  pointer-events: none;
+  stroke: var(--demo-rule-strong);
+  stroke-dasharray: 2 9;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.registration circle {
+  opacity: 0.34;
+}
+
+.expressionField {
+  fill: none;
+  pointer-events: none;
+  stroke: rgba(117, 157, 128, 0.2);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.expressionField path:first-of-type {
+  stroke: rgba(196, 150, 88, 0.26);
+}
+
+.featureTarget {
+  cursor: pointer;
+  outline: none;
+}
+
+.faceHit {
+  fill: transparent;
+  pointer-events: all;
+  stroke: transparent;
+  stroke-width: 20;
+}
+
+.structureFace {
+  fill: rgba(196, 150, 88, 0.07);
+  pointer-events: none;
+  stroke: rgba(196, 150, 88, 0.22);
+  stroke-width: 0.85;
+  transition: fill 160ms linear, opacity 160ms linear, stroke 160ms linear;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-standing-kind="candidate"] .structureFace {
+  fill: rgba(227, 222, 213, 0.018);
+  stroke: rgba(227, 222, 213, 0.22);
+  stroke-dasharray: 3 8;
+}
+
+[data-standing-kind="open"] .structureFace,
+[data-standing-kind="withheld"] .structureFace {
+  fill: transparent !important;
+  stroke-dasharray: 3 9;
+}
+
+[data-standing-kind="open"] .structureFace {
+  stroke: rgba(169, 201, 232, 0.46);
+}
+
+[data-standing-kind="withheld"] .structureFace {
+  opacity: 0.34;
+  stroke: var(--demo-withheld);
+  stroke-dasharray: 1 12;
+}
+
+.featureTarget:hover .structureFace,
+.featureTarget:focus .structureFace,
+.featureTarget[data-selected="true"] .structureFace {
+  fill: rgba(196, 150, 88, 0.16);
+  stroke: var(--demo-gold-bright);
+}
+
+.edgeHit {
+  fill: none;
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-width: 120;
+}
+
+.structureEdge {
+  pointer-events: none;
+  stroke: rgba(227, 222, 213, 0.64);
+  stroke-linecap: square;
+  stroke-width: 1.15;
+  transition: opacity 160ms linear, stroke 160ms linear, stroke-width 160ms linear;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-standing-kind="committed"] .structureEdge {
+  stroke: var(--demo-gold);
+  stroke-width: 1.35;
+}
+
+[data-standing-kind="evidence"] .structureEdge {
+  stroke: var(--demo-blue);
+  stroke-dasharray: 3 5;
+}
+
+[data-standing-kind="candidate"] .structureEdge {
+  opacity: 0.46;
+  stroke-dasharray: 3 8;
+}
+
+[data-standing-kind="open"] .structureEdge {
+  stroke: var(--demo-open);
+  stroke-dasharray: 2 6;
+}
+
+[data-standing-kind="withheld"] .structureEdge {
+  opacity: 0.42;
+  stroke: var(--demo-withheld);
+}
+
+.featureTarget:hover .structureEdge,
+.featureTarget:focus .structureEdge,
+.featureTarget[data-selected="true"] .structureEdge {
+  opacity: 1;
+  stroke: var(--demo-paper);
+  stroke-width: 2.2;
+}
+
+.openMark circle {
+  fill: var(--demo-ground);
+  stroke: var(--demo-open);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.openMark path,
+.withheldMark path {
+  fill: none;
+  pointer-events: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.openMark {
+  color: var(--demo-open);
+  pointer-events: none;
+}
+
+.withheldMark {
+  color: var(--demo-withheld);
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.pointHit {
+  fill: transparent;
+  pointer-events: all;
+  stroke: none;
+}
+
+.pointHalo {
+  fill: transparent;
+  opacity: 0;
+  pointer-events: none;
+  stroke: var(--demo-paper);
+  stroke-width: 0.7;
+  transition: opacity 160ms linear;
+  vector-effect: non-scaling-stroke;
+}
+
+.pointRing {
+  fill: var(--demo-ground);
+  pointer-events: none;
+  stroke: var(--demo-paper-soft);
+  stroke-width: 1.2;
+  transition: fill 160ms linear, stroke 160ms linear;
+  vector-effect: non-scaling-stroke;
+}
+
+.pointCore {
+  fill: var(--demo-paper-soft);
+  pointer-events: none;
+}
+
+[data-standing-kind="committed"] .pointRing {
+  stroke: var(--demo-gold);
+  stroke-width: 1.7;
+}
+
+[data-standing-kind="committed"] .pointCore {
+  fill: var(--demo-gold-bright);
+}
+
+[data-standing-kind="evidence"] .pointRing {
+  stroke: var(--demo-blue);
+}
+
+[data-standing-kind="evidence"] .pointCore {
+  fill: var(--demo-blue);
+}
+
+[data-standing-kind="candidate"] .pointRing {
+  fill: transparent;
+  opacity: 0.7;
+  stroke-dasharray: 2 5;
+}
+
+[data-standing-kind="open"] .pointRing {
+  stroke: var(--demo-open);
+  stroke-dasharray: 2 4;
+}
+
+[data-standing-kind="withheld"] .pointRing,
+[data-standing-kind="withheld"] .pointCore {
+  opacity: 0.38;
+}
+
+.featureTarget:hover .pointHalo,
+.featureTarget:focus .pointHalo,
+.featureTarget[data-selected="true"] .pointHalo {
+  opacity: 0.58;
+}
+
+.featureTarget:hover .pointRing,
+.featureTarget:focus .pointRing,
+.featureTarget[data-selected="true"] .pointRing {
+  fill: var(--demo-paper);
+  stroke: var(--demo-paper);
+}
+
+.featureTarget:hover .pointCore,
+.featureTarget:focus .pointCore,
+.featureTarget[data-selected="true"] .pointCore {
+  fill: var(--demo-ground);
+}
+
+.labelLeader {
+  opacity: 0.68;
+  pointer-events: none;
+  stroke: var(--demo-rule-strong);
+  stroke-dasharray: 1 5;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.pointLabel {
+  fill: var(--demo-paper-soft);
+  font-family: var(--sans, "Geist Variable", Inter, system-ui, sans-serif);
+  font-size: 10px;
+  font-weight: 580;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.pointLabelId {
+  fill: var(--demo-paper-dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+}
+
+.pointLabelTitle {
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: 12px;
+  font-weight: 390;
+  letter-spacing: 0;
+}
+
+.player[data-expression-variant="art"] .pointHalo {
+  stroke: rgba(225, 189, 130, 0.58);
+}
+
+.player[data-expression-variant="art"] [data-standing-kind="committed"] .pointHalo {
+  fill: rgba(196, 150, 88, 0.08);
+  opacity: 0.35;
+  stroke-dasharray: 2 5;
+}
+
+.decorations {
+  pointer-events: none;
+}
+
+.expressionLight circle:first-child {
+  fill: currentColor;
+  opacity: 0.1;
+}
+
+.expressionLight circle:last-child {
+  fill: currentColor;
+  filter: drop-shadow(0 0 5px currentColor);
+  stroke: rgba(255, 248, 225, 0.8);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.expressionStar {
+  fill: currentColor;
+  filter: drop-shadow(0 0 8px currentColor);
+  opacity: 0.9;
+  stroke: rgba(255, 248, 225, 0.72);
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.garland path {
+  fill: none;
+  opacity: 0.72;
+  stroke: var(--demo-gold);
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.orientationMark {
+  bottom: 18px;
+  color: var(--demo-paper-dim);
+  display: grid;
+  font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  gap: 4px 6px;
+  grid-template-columns: auto 34px;
+  pointer-events: none;
+  position: absolute;
+  right: 18px;
+}
+
+.orientationMark i {
+  align-self: center;
+  border-top: 1px solid var(--demo-rule-strong);
+  display: block;
+}
+
+.controlDeck {
+  align-items: stretch;
+  border-top: 1px solid var(--demo-rule);
+  display: grid;
+  grid-template-columns: 92px 92px 126px minmax(0, 1fr);
+  min-height: 54px;
+}
+
+.controlDeck button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--demo-rule);
+  color: var(--demo-paper-soft);
+  cursor: pointer;
+  display: flex;
+  font-size: 17px;
+  gap: 8px;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 12px;
+}
+
+.controlDeck button span,
+.controlDeck button kbd {
+  color: var(--demo-paper-dim);
+  font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.controlDeck button:hover {
+  background: var(--demo-paper);
+  color: var(--demo-ground);
+}
+
+.controlDeck button:hover span,
+.controlDeck button:hover kbd {
+  color: var(--demo-ground);
+}
+
+.controlDeck > p {
+  align-items: center;
+  color: var(--demo-paper-dim);
+  display: flex;
+  font: 8px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  justify-content: flex-end;
+  letter-spacing: 0.1em;
+  margin: 0;
+  padding: 0 16px;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.inspector {
+  flex: 1;
+  min-height: 330px;
+  padding: 22px 24px 26px;
+}
+
+.inspector h3 {
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: 27px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  margin: 18px 0 0;
+}
+
+.inspection {
+  color: var(--demo-paper-soft);
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: 15px;
+  line-height: 1.48;
+  margin: 14px 0 21px;
+}
+
+.inspectorRows {
+  margin: 0;
+}
+
+.inspectorRows > div {
+  border-top: 1px solid var(--demo-rule);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 86px minmax(0, 1fr);
+  padding: 9px 0;
+}
+
+.inspectorRows > div:last-child {
+  border-bottom: 1px solid var(--demo-rule);
+}
+
+.inspectorRows dt,
+.inspectorRows dd {
+  font-size: 10px;
+  line-height: 1.45;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.inspectorRows dt {
+  color: var(--demo-paper-dim);
+  text-transform: lowercase;
+}
+
+.inspectorRows dd {
+  color: var(--demo-paper-soft);
+}
+
+.inspectorRows code,
+.semanticRefs code,
+.passport code,
+.conformanceRows code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 8px;
+}
+
+.semanticRefs {
+  margin-top: 22px;
+}
+
+.semanticRefs h4,
+.limitations h4 {
+  color: var(--demo-paper-dim);
+  font-size: 8px;
+  font-weight: 620;
+  letter-spacing: 0.13em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.semanticRefs ul,
+.limitations ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.semanticRefs li,
+.limitations li {
+  border-top: 1px solid var(--demo-rule);
+  color: var(--demo-paper-soft);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  padding: 7px 0;
+}
+
+.semanticRefs p,
+.limitations p {
+  color: var(--demo-paper-dim);
+  font-size: 10px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.conformance {
+  border-top: 1px solid var(--demo-rule);
+  padding: 22px 24px 24px;
+}
+
+.conformanceHeading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.conformanceHeading > strong {
+  color: var(--demo-paper-soft);
+  font: 8px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.conformanceHeading > strong[data-status="fail"] {
+  color: #d19583;
+}
+
+.conformanceRows {
+  margin-top: 14px;
+}
+
+.conformanceRows > div {
+  display: grid;
+  font: 8px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) 48px 34px;
+  padding: 4px 0;
+}
+
+.conformanceRows span {
+  color: var(--demo-paper-soft);
+}
+
+.conformanceRows code {
+  color: var(--demo-paper-dim);
+  text-align: right;
+}
+
+.conformanceRows strong {
+  color: var(--demo-paper-soft);
+  font: inherit;
+  text-align: right;
+}
+
+.conformanceRows > div[data-status="fail"] strong {
+  color: #d19583;
+  text-decoration: underline double;
+}
+
+.conformanceBoundary {
+  border-top: 1px solid var(--demo-rule);
+  color: var(--demo-paper-dim);
+  font-size: 9px;
+  line-height: 1.45;
+  margin: 13px 0 0;
+  padding-top: 11px;
+}
+
+.limitations {
+  margin-top: 20px;
+}
+
+.limitations li {
+  font-size: 9px;
+}
+
+.passport {
+  align-items: start;
+  border-top: 1px solid var(--demo-rule);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(320px, 1.3fr) minmax(220px, 0.8fr);
+  padding: 20px 24px;
+}
+
+.passport > div:first-child {
+  display: grid;
+  gap: 7px;
+}
+
+.passport strong {
+  font-family: var(--display, "Newsreader Variable", Georgia, serif);
+  font-size: 15px;
+  font-weight: 390;
+}
+
+.passport span,
+.passportNote {
+  color: var(--demo-paper-dim);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.passport dl {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.passport dl > div {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 74px minmax(0, 1fr);
+}
+
+.passport dt,
+.passport dd {
+  font-size: 8px;
+  margin: 0;
+}
+
+.passport dt {
+  color: var(--demo-paper-dim);
+  text-transform: uppercase;
+}
+
+.passport dd {
+  color: var(--demo-paper-soft);
+  min-width: 0;
+}
+
+.passport dd code {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passportNote {
+  margin: 0;
+  text-align: right;
+}
+
+@media (max-width: 980px) {
+  .playerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stageColumn {
+    border-right: 0;
+  }
+
+  .sidebar {
+    border-top: 1px solid var(--demo-rule);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .conformance {
+    border-left: 1px solid var(--demo-rule);
+    border-top: 0;
+  }
+
+  .passport {
+    grid-template-columns: 1fr 1.4fr;
+  }
+
+  .passportNote {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .identityBar {
+    gap: 18px;
+    min-height: 98px;
+    padding: 17px 16px;
+  }
+
+  .identityCopy h2 {
+    font-size: 34px;
+  }
+
+  .identityCopy > p:last-child {
+    font-size: 14px;
+  }
+
+  .standingBlock {
+    max-width: 118px;
+  }
+
+  .standingBlock span {
+    font-size: 7px;
+    padding: 6px;
+  }
+
+  .stageRegister {
+    font-size: 7px;
+    gap: 12px;
+    padding: 0 11px;
+  }
+
+  .stageRegister span:last-child {
+    max-width: 152px;
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stageFrame,
+  .stage {
+    min-height: 430px;
+  }
+
+  .pointLabelTitle {
+    display: none;
+  }
+
+  .pointLabel,
+  .pointLabelId {
+    font-size: 12px;
+  }
+
+  .controlDeck {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .controlDeck button {
+    min-height: 48px;
+  }
+
+  .controlDeck > p {
+    border-top: 1px solid var(--demo-rule);
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    min-height: 44px;
+    padding: 0 13px;
+    text-align: left;
+  }
+
+  .sidebar {
+    display: block;
+  }
+
+  .inspector {
+    min-height: 0;
+    padding: 22px 18px;
+  }
+
+  .conformance {
+    border-left: 0;
+    border-top: 1px solid var(--demo-rule);
+    padding: 22px 18px;
+  }
+
+  .passport {
+    display: block;
+    padding: 20px 18px;
+  }
+
+  .passport dl {
+    margin-top: 22px;
+  }
+
+  .passportNote {
+    margin-top: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player *,
+  .player *::before,
+  .player *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}

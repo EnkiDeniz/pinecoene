@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       { source: "/master", headers: [noindex] },
       { source: "/theorem", headers: [noindex] },
+      { source: "/demo", headers: [noindex] },
+      { source: "/demo/:path*", headers: [noindex] },
       { source: "/sketches/:path+", headers: [noindex] },
       { source: "/w/:path+", headers: [noindex] },
     ];
