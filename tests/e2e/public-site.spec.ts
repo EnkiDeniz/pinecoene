@@ -164,7 +164,8 @@ test.describe("Public Door V0.2", () => {
 
   test("the public profile makes no external browser requests", async ({ page }) => {
     const external:string[]=[];
-    page.on("request", (request) => { const url=new URL(request.url()); if(url.origin!=="http://localhost:3010") external.push(request.url()); });
+    const applicationOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3010").origin;
+    page.on("request", (request) => { const url=new URL(request.url()); if(url.origin!==applicationOrigin) external.push(request.url()); });
     for(const path of ["/", "/works", "/works/genesis", "/join", "/w/genesis-demonstration"]) await page.goto(path);
     expect(external).toEqual([]);
   });
