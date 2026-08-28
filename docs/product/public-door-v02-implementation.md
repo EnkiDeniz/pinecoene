@@ -1,6 +1,6 @@
 # Pinecœne Public Door V0.2 — Implementation Receipt
 
-**Standing:** implemented on isolated branch; production not promoted
+**Standing:** promoted to production and independently verified on 2026-08-27 (America/New_York)
 
 **Branch:** `codex/public-site-v0.2`
 
@@ -105,4 +105,29 @@ Local verification at the time of this receipt:
 - `/master`, `/theorem`, and `/sitemap.xml`: absent/404
 - 390×844 horizontal overflow: pass after correcting the Works renderer width
 
-Hosted Preview deployment ID, URL, Git SHA, environment fingerprint, and hosted rerun belong to Gate B and are appended only after the immutable Preview is created and verified. Production remains the prior deployment until Deniz separately approves promotion.
+## Gate B and production release
+
+Deniz approved the exact protected Preview for production. Vercel's standard promotion operation created a production-environment deployment from the approved candidate while preserving the exact Git SHA and recording the Preview as `originalDeploymentId`.
+
+| Release fact | Value |
+|---|---|
+| Approved Preview | `dpl_C1AqVbGhgurb28sUzrv3jRbZkZ6L` |
+| Approved Preview URL | `pinecoene-99p67jwz2-enkidenizs-projects.vercel.app` |
+| Production deployment | `dpl_4ZmMSt2W8WBm17ToENUg5q39YGM4` |
+| Exact Git SHA | `4323055bc521d8db7544a13cd08745e423906b62` |
+| Implementation commit | `cdb63db761f01d9df5826b5cee5da93f4e5311ce` |
+| Production target | `production` |
+| Production region | `iad1` |
+| Previous rollback deployment | `dpl_DWLo2wJBRyb7ochzZ5MUWcCVbMD9` |
+
+Production aliases verified on the promoted deployment:
+
+- `pinecoene.com`
+- `www.pinecoene.com` → `pinecoene.com`
+- `xn--pinecne-nnb.com` → `pinecoene.com`
+- `www.xn--pinecne-nnb.com` → `pinecoene.com`
+- project and branch Vercel aliases
+
+Hosted production acceptance completed with **48/48 passing** checks across Chromium, desktop WebKit, and mobile WebKit. The run covered the Door, Works, all Genesis views, Studio fork, Offering Preview, Locket, Encounter, bounded local Return, redirects, unknown identifiers, noindex, CSP, no external application requests, storage denial, WebGL fallback, reduced motion, accessibility, and 390×844 overflow.
+
+`robots.txt` denies all crawlers, every checked public route emits `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet`, and `/sitemap.xml` remains absent. The prior production deployment is retained as the immediate rollback target.
