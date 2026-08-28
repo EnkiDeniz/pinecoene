@@ -1,0 +1,9 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { PublicChrome } from "@/components/public/PublicChrome";
+import { StudioInstrument } from "@/components/studio/StudioInstrument";
+import { compileStudioArtifact } from "@/lib/studio-compiler";
+import { FIXTURE_IDS,getFixtureManifest } from "@/lib/studio-fixtures";
+export const metadata:Metadata={title:"New local study",robots:{index:false,follow:false}};
+export default async function NewStudyPage({searchParams}:{searchParams:Promise<{fixture?:string}>}){const {fixture}=await searchParams;if(fixture&&FIXTURE_IDS.includes(fixture as (typeof FIXTURE_IDS)[number])){const artifact=await compileStudioArtifact(await getFixtureManifest(fixture as (typeof FIXTURE_IDS)[number]));return <StudioInstrument initialArtifact={artifact} guided/>;}const manifests=await Promise.all(FIXTURE_IDS.map(getFixtureManifest));return <PublicChrome><main className="useChooser"><section><p className="publicEyebrow">STUDIO · GUIDED FIXTURE FORK</p><h1>Fork a specimen.</h1><p className="useLead">Operate a deterministic study without pretending arbitrary source reading, owner admission, sending, or delivery exists here.</p><div className="useChoices">{manifests.map((manifest)=><Link key={manifest.fixtureId} href={`/studio/new?fixture=${manifest.fixtureId}`}><span>{manifest.fixtureId} · {manifest.fixtureId === "pcn-0002" ? "ORIGIN BINDING UNRESOLVED" : "PUBLISHED GENESIS FIXTURE"}</span><h2>{manifest.fixtureId === "pcn-0002" ? "Current Studio specimen" : manifest.title}</h2><p>{manifest.recordSummary}</p><strong>Begin guided study <ArrowRight aria-hidden="true"/></strong></Link>)}</div><aside className="publicBoundary">Canonical fixtures never mutate. Your choices create a labelled prototype-only browser-local fork bound to the fixture hash.</aside></section></main></PublicChrome>;}

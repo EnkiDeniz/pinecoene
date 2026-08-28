@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { SCIENCE_SOURCES } from "@/lib/public-content";
+import { DOOR_COPY,getPublicDoorReleaseManifest } from "@/lib/public-release";
 
 const RECEIVED_SHA = "b098b370c9c9a13756705023bd384a446a48eb37ce3d188a9ec8159258013671";
 
@@ -12,15 +13,18 @@ describe("public content authority", () => {
   });
 
   it("keeps the governing launch lines in the public reading", async () => {
-    const home = await readFile("src/app/(public)/page.mdx", "utf8");
+    const home = await readFile("src/components/public/DoorExperience.tsx", "utf8");
+    expect(home).toContain('import { DOOR_BEATS,DOOR_COPY } from "@/lib/door-copy"');
+    const releasedCopy=JSON.stringify(DOOR_COPY);
     for (const line of [
-      "A bet that the shape of a thought can be an object.",
-      "Pinecœne is a receipt-bound format for inquiry.",
-      "Expression is free. Standing is not.",
-      "A Muse may matter without becoming evidence.",
-      "The reading is not the work.",
+      "This is a Pinecœne.",
+      "They frighten us because they threaten what is known.",
+      "it can become something beautiful.",
+      "That object you turned is one of those shapes.",
+      "Come make a Pinecœne.",
       "The music is still playing.",
-    ]) expect(home).toContain(line);
+    ]) expect(releasedCopy).toContain(line);
+    expect(DOOR_COPY.ending).toBe("The music is still playing.");
   });
 
   it("maps every neighboring science source to claims and a limitation", () => {
@@ -32,12 +36,16 @@ describe("public content authority", () => {
     }
   });
 
-  it("never lets candidate source routes claim canonical standing", async () => {
-    const pages = await Promise.all(["master", "theorem"].map((route) => readFile(`src/app/(public)/${route}/page.mdx`, "utf8")));
-    for (const page of pages) {
-      expect(page).toContain("SourceBanner");
-      expect(page).toContain("robots: { index: false, follow: false }");
-      expect(page).toMatch(/exact .* document is absent/i);
-    }
+  it("keeps deep candidate source routes outside the public route tree", async () => {
+    await expect(readFile("src/app/(public)/master/page.mdx", "utf8")).rejects.toMatchObject({ code:"ENOENT" });
+    await expect(readFile("src/app/(public)/theorem/page.mdx", "utf8")).rejects.toMatchObject({ code:"ENOENT" });
+  });
+
+  it("binds the Door to Genesis and Pattern A", async () => {
+    const manifest=await getPublicDoorReleaseManifest();
+    expect(manifest.doorWorkRef.workIdentityRef).toMatchObject({internalId:"pcn-0001",publicSlug:"genesis"});
+    expect(manifest.publishedWorkRefs).toHaveLength(1);
+    expect(manifest.shelfEntries.map((entry)=>entry.kind)).toEqual(["published_work","curation_note","owed_experiment"]);
+    expect(manifest.sentenceIntake).toEqual({state:"closed"});
   });
 });

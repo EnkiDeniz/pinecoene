@@ -4,7 +4,7 @@ import type {
   OwnerArchiveV0_1,
 } from "@/lib/protocol";
 
-const ajv = new Ajv({ allErrors: true, strict: false });
+const ajv = typeof window === "undefined" ? new Ajv({ allErrors: true, strict: false }) : null;
 
 const offeringSchema = {
   type: "object",
@@ -77,10 +77,10 @@ const ownerArchiveSchema = {
   },
 } as const;
 
-const validateOffering = ajv.compile(offeringSchema);
-const validateOwnerArchive = ajv.compile(ownerArchiveSchema);
+const validateOffering = ajv?.compile(offeringSchema) ?? null;
+const validateOwnerArchive = ajv?.compile(ownerArchiveSchema) ?? null;
 
-function validationMessage(prefix: string, errors: typeof validateOffering.errors) {
+function validationMessage(prefix: string, errors: NonNullable<typeof validateOffering>["errors"]) {
   const detail = errors
     ?.map((error) => `${error.instancePath || "/"} ${error.message ?? "is invalid"}`)
     .join("; ");
@@ -90,15 +90,17 @@ function validationMessage(prefix: string, errors: typeof validateOffering.error
 export function assertOfferingPackage(
   value: unknown,
 ): asserts value is OfferingPackageV0_1 {
-  if (!validateOffering(value)) {
+  if (validateOffering && !validateOffering(value)) {
     throw new Error(validationMessage("Offering package failed closed", validateOffering.errors));
   }
+  if (!validateOffering && (!value || typeof value !== "object" || (value as { schemaVersion?:unknown }).schemaVersion !== "pinecoene.offering-package.v0.1-showcase")) throw new Error("Offering package failed closed: client-safe structure validation failed.");
 }
 
 export function assertOwnerArchive(
   value: unknown,
 ): asserts value is OwnerArchiveV0_1 {
-  if (!validateOwnerArchive(value)) {
+  if (validateOwnerArchive && !validateOwnerArchive(value)) {
     throw new Error(validationMessage("Owner archive failed closed", validateOwnerArchive.errors));
   }
+  if (!validateOwnerArchive && (!value || typeof value !== "object" || (value as { schemaVersion?:unknown }).schemaVersion !== "pinecoene.owner-archive.v0.1-showcase")) throw new Error("Owner archive failed closed: client-safe structure validation failed.");
 }

@@ -14,8 +14,6 @@ import {
   Pause,
   Play,
   SealCheck,
-  SpeakerHigh,
-  SpeakerSlash,
   X,
 } from "@phosphor-icons/react";
 import { FormStage } from "@/components/form/FormStage";
@@ -25,26 +23,22 @@ import {
   listReturnCandidates,
   listSuccessors,
   loadStudy,
-  saveOfferingV2,
+  saveRecipientPackage,
   saveReturnDisposition,
   saveStudy,
-  saveSuccessor,
 } from "@/lib/custody";
 import {
-  buildOfferingPackageV0_2,
   compileStudioArtifact,
   createSessionStudy,
-  createSuccessorStudy,
   disposeReturn,
 } from "@/lib/studio-compiler";
+import { buildGoverningOfferingPackage,type GoverningOfferingPackage } from "@/lib/offering-v01";
 import { defaultDecisions } from "@/lib/studio-fixtures";
 import type {
   Address,
   CompiledStudioArtifact,
   DecisionDisposition,
   ExpressionProfileV0_2,
-  OfferingPackageV0_2,
-  OfferingPermissionsV0_2,
   OwnerDecisionSetV0_1,
   Resolution,
   ReturnCandidateV0_1,
@@ -62,12 +56,12 @@ const MODES: Array<{ id: StudioMode; label: string }> = [
 ];
 const GUIDED_MODES: StudioMode[] = ["record", "admission", "recognition", "becoming", "fold", "offering", "lineage"];
 const RESOLUTIONS: Array<{ id: Resolution; label: string; description: string }> = [
-  { id:"R0", label:"Mark", description:"Identity and title only" },
-  { id:"R1", label:"Trace", description:"Permitted record trace" },
+  { id:"R0", label:"Glyph", description:"Smallest recognition-safe mark" },
+  { id:"R1", label:"Card", description:"Identity and bounded summary" },
   { id:"R2", label:"Form", description:"Settled Fold" },
   { id:"R3", label:"Inspect", description:"Semantic inspection" },
-  { id:"R4", label:"Share", description:"Address and lineage" },
-  { id:"R5", label:"Open", description:"Replay and Return" },
+  { id:"R4", label:"Replay", description:"Permitted Becoming" },
+  { id:"R5", label:"Recital", description:"Full permitted performance" },
 ];
 const ADDRESSES: Address[] = ["latent", "day", "night", "earth", "seas", "keeper"];
 
@@ -98,8 +92,8 @@ export function StudioInstrument({
   const [address, setAddress] = useState<Address>("latent");
   const [resolution, setResolution] = useState<Resolution>("R2");
   const [expression, setExpression] = useState<ExpressionProfileV0_2>({ schemaVersion:"pinecoene.expression.v0.2", finish:"metal", temperament:"solemn", dedication:"For the next keeper at the Fold." });
-  const [permissions, setPermissions] = useState<OfferingPermissionsV0_2>({ inspectRecord:true, inspectMuses:false, createReturn:true, allowMuseReuse:false, allowWithdrawal:true });
-  const [offering, setOffering] = useState<OfferingPackageV0_2>();
+  const [offeringConfirmed, setOfferingConfirmed] = useState(false);
+  const [offering, setOffering] = useState<GoverningOfferingPackage>();
   const [returns, setReturns] = useState<ReturnCandidateV0_1[]>([]);
   const [successors, setSuccessors] = useState<SuccessorStudyV0_1[]>([]);
   const [busy, setBusy] = useState(false);
@@ -107,7 +101,6 @@ export function StudioInstrument({
   const [replayMs, setReplayMs] = useState(0);
   const [replayPlaying, setReplayPlaying] = useState(false);
   const [condensed, setCondensed] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
   const reducedMotion = useReducedMotion();
   const duration = condensed ? 30000 : 84000;
 
@@ -145,7 +138,7 @@ export function StudioInstrument({
 
   const reloadReturns = useCallback(() => {
     void Promise.all([listReturnCandidates(), listSuccessors(currentStudy?.studyId ?? artifact.manifest.fixtureId)]).then(([nextReturns, nextSuccessors]) => {
-      setReturns(nextReturns.filter((item) => !offering || item.offeringId === offering.offeringId));
+      setReturns(nextReturns.filter((item) => !offering || item.offeringId === offering.offering.offeringId));
       setSuccessors(nextSuccessors);
     });
   }, [artifact.manifest.fixtureId, currentStudy?.studyId, offering]);
@@ -185,10 +178,15 @@ export function StudioInstrument({
     setAddress("latent");
     setResolution("R2");
     setOffering(undefined);
+    setOfferingConfirmed(false);
     setNotice("Returned to the immutable canonical fixture.");
   }
 
   async function compileOffering() {
+    if (!offeringConfirmed) {
+      setNotice("Confirm your right to offer this exact projection before packaging it.");
+      return;
+    }
     setBusy(true);
     let source = artifact;
     let study = currentStudy;
@@ -199,21 +197,17 @@ export function StudioInstrument({
       source = await compileStudioArtifact(artifact.manifest, { decisions, address, study });
       setArtifact(source);
     }
-    const next = await buildOfferingPackageV0_2(source, { resolution, address, expression, permissions, title:`${artifact.manifest.title} · ${resolution}`, senderLabel:"Studio keeper" });
-    await saveOfferingV2(next);
+    const next = await buildGoverningOfferingPackage(source, { resolution, address, expression, title:`${artifact.manifest.title} · ${resolution}`, senderSnapshot:"Studio keeper", mode:"same_browser_preview", studyId:study.studyId, basis:"owner_confirmed_local" });
+    await saveRecipientPackage(next);
     setOffering(next);
     setNotice("Offering prepared locally. This simulates packaging, not sending or delivery.");
     setBusy(false);
   }
 
-  async function handleReturnDisposition(candidate: ReturnCandidateV0_1, disposition: "hold_at_rest" | "dock_to_successor" | "archive_mark" | "reject") {
+  async function handleReturnDisposition(candidate: ReturnCandidateV0_1, disposition: "hold_at_rest" | "archive_mark" | "reject") {
     const result = await disposeReturn(candidate, disposition, "Owner simulation in Curated Studio V1.");
     await saveReturnDisposition(result);
-    if (disposition === "dock_to_successor") {
-      const successor = await createSuccessorStudy(currentStudy?.studyId ?? artifact.manifest.fixtureId, candidate);
-      await saveSuccessor(successor);
-    }
-    setNotice(`Return disposition simulated: ${disposition.replaceAll("_", " ")}.`);
+    setNotice(`Local demonstration disposition: ${disposition.replaceAll("_", " ")}. No successor standing was created.`);
     reloadReturns();
   }
 
@@ -226,9 +220,9 @@ export function StudioInstrument({
   return (
     <main className={`studioInstrument ${mode === "becoming" ? "isBecoming" : ""}`}>
       <header className="instrumentTopbar studioTopbar">
-        <Link className="instrumentBrand" href="/sketches"><ArrowLeft aria-hidden="true" /> Pinecœne <span>{guided ? "Guided Study" : "Sketch"}</span></Link>
+        <Link className="instrumentBrand" href="/studio"><ArrowLeft aria-hidden="true" /> Pinecœne <span>{guided ? "Guided Study" : "Studio"}</span></Link>
         <div className="artifactIdentity"><strong>{artifact.manifest.fixtureId}</strong><span>{artifact.manifest.title} · {currentStudy ? "PROTOTYPE-ONLY FORK" : "IMMUTABLE FIXTURE"}</span></div>
-        <nav aria-label="Studio utilities"><button onClick={() => setSoundOn((value) => !value)} aria-pressed={soundOn}>{soundOn ? <SpeakerHigh aria-hidden="true" /> : <SpeakerSlash aria-hidden="true" />} Sound {soundOn ? "on" : "off"}</button><Link href="/sketches/vital-sign">Vital Sign <sup>EXP</sup></Link></nav>
+        <nav aria-label="Studio utilities"><Link href="/vital-sign">Vital Sign <sup>EXP</sup></Link></nav>
       </header>
       <div className="studioModeRail" role="tablist" aria-label="Studio modes">
         {(guided ? MODES.filter((item) => GUIDED_MODES.includes(item.id)) : MODES).map((item) => <button key={item.id} role="tab" aria-selected={mode === item.id} onClick={() => setMode(item.id)}>{item.label}</button>)}
@@ -261,7 +255,7 @@ export function StudioInstrument({
           {mode === "becoming" ? <BecomingPanel artifact={artifact} phase={phase} currentCue={currentCue} reducedMotion={reducedMotion} onStep={(nextPhase) => setReplayMs((nextPhase - 0.5) / 7 * duration)} /> : null}
           {mode === "fold" ? <FoldPanel artifact={artifact} selectedFeature={selectedFeature} setSelectedFeature={(id, copy) => { setSelectedFeature(id); setInspection(copy); }} /> : null}
           {mode === "lineage" ? <LineagePanel artifact={artifact} study={currentStudy} offering={offering} successors={successors} /> : null}
-          {mode === "offering" ? <OfferingPanel artifact={artifact} offering={offering} address={address} setAddress={setAddress} resolution={resolution} setResolution={setResolution} expression={expression} setExpression={setExpression} permissions={permissions} setPermissions={setPermissions} compileOffering={() => void compileOffering()} busy={busy} /> : null}
+          {mode === "offering" ? <OfferingPanel artifact={artifact} offering={offering} address={address} setAddress={setAddress} resolution={resolution} setResolution={setResolution} expression={expression} setExpression={setExpression} confirmed={offeringConfirmed} setConfirmed={setOfferingConfirmed} invalidateOffering={() => { setOffering(undefined); setOfferingConfirmed(false); }} compileOffering={() => void compileOffering()} busy={busy} /> : null}
           {mode === "returns" ? <ReturnsPanel returns={returns} successors={successors} onDisposition={(candidate, disposition) => void handleReturnDisposition(candidate, disposition)} /> : null}
         </aside>
       </section>
@@ -302,15 +296,16 @@ function FoldPanel({ artifact, selectedFeature, setSelectedFeature }: { artifact
   return <><PanelHeading eyebrow="SETTLED CONFORMATION" title="The Fold"><p>Spatial and semantic inspection remain synchronized. What you see has standing.</p></PanelHeading><div className="inspectorSection anatomyRows">{artifact.conformation.scene.features.map((feature) => <button key={feature.featureId} data-selected={selectedFeature === feature.featureId} onClick={() => setSelectedFeature(feature.featureId,feature.inspectionCopy)}><span>{feature.materialRole}</span><strong>{feature.kind.replaceAll("_"," ")}</strong><small>{feature.semanticRefs.length} semantic refs</small></button>)}</div><dl className="hashLedger"><div><dt>Semantic</dt><dd>{artifact.conformation.score.semanticHash}</dd></div><div><dt>Topology</dt><dd>{artifact.conformation.score.topologyHash}</dd></div><div><dt>Scene</dt><dd>{artifact.conformation.scene.sceneHash}</dd></div></dl></>;
 }
 
-function LineagePanel({ artifact, study, offering, successors }: { artifact:CompiledStudioArtifact; study?:SessionStudyV0_1; offering?:OfferingPackageV0_2; successors:SuccessorStudyV0_1[] }) {
-  return <><PanelHeading eyebrow="PROVENANCE · DESIGNER'S NOTE" title="Lineage"><p>{artifact.manifest.designerNote}</p></PanelHeading><div className="inspectorSection lineageNodes"><div><span>01 · SOURCE</span><strong>{artifact.manifest.sourceLabel}</strong><small>{artifact.manifest.fixtureHash}</small></div><div><span>02 · AUTHORED READING</span><strong>{artifact.manifest.events.length} candidates · {artifact.manifest.relations.length} relations</strong><small>fixture-authored</small></div><div><span>03 · DECISIONS</span><strong>{artifact.conformation.score.admittedEvents.length} admitted · {artifact.conformation.score.openEventIds.length} open</strong><small>{artifact.conformation.score.semanticHash}</small></div><div><span>04 · FOLD</span><strong>{artifact.manifest.formFamily.replaceAll("_"," ")}</strong><small>{artifact.conformation.score.topologyHash}</small></div>{study ? <div><span>05 · STUDY FORK</span><strong>{study.studyId}</strong><small>prototype_only · {study.fixtureHash}</small></div> : null}{offering ? <div><span>06 · OFFERING</span><strong>{offering.offeringId}</strong><small>{offering.resolution} · local simulation</small></div> : null}{successors.map((successor) => <div key={successor.successorId}><span>07 · SUCCESSOR</span><strong>{successor.successorId}</strong><small>docked locally · {successor.returnId}</small></div>)}</div><div className="inspectorSection truthBlock"><SealCheck aria-hidden="true" /><p>{artifact.manifest.disclosure}</p></div></>;
+function LineagePanel({ artifact, study, offering, successors }: { artifact:CompiledStudioArtifact; study?:SessionStudyV0_1; offering?:GoverningOfferingPackage; successors:SuccessorStudyV0_1[] }) {
+  return <><PanelHeading eyebrow="PROVENANCE · DESIGNER'S NOTE" title="Lineage"><p>{artifact.manifest.designerNote}</p></PanelHeading><div className="inspectorSection lineageNodes"><div><span>01 · SOURCE</span><strong>{artifact.manifest.sourceLabel}</strong><small>{artifact.manifest.fixtureHash}</small></div><div><span>02 · AUTHORED READING</span><strong>{artifact.manifest.events.length} candidates · {artifact.manifest.relations.length} relations</strong><small>fixture-authored</small></div><div><span>03 · DECISIONS</span><strong>{artifact.conformation.score.admittedEvents.length} admitted · {artifact.conformation.score.openEventIds.length} open</strong><small>{artifact.conformation.score.semanticHash}</small></div><div><span>04 · FOLD</span><strong>{artifact.manifest.formFamily.replaceAll("_"," ")}</strong><small>{artifact.conformation.score.topologyHash}</small></div>{study ? <div><span>05 · STUDY FORK</span><strong>{study.studyId}</strong><small>prototype_only · {study.fixtureHash}</small></div> : null}{offering ? <div><span>06 · OFFERING</span><strong>{offering.offering.offeringId}</strong><small>R{offering.projection.permissions.resolution} · local preview</small></div> : null}{successors.map((successor) => <div key={successor.successorId}><span>LEGACY · SUCCESSOR METADATA</span><strong>{successor.successorId}</strong><small>read-only legacy evidence · no successor authority</small></div>)}</div><div className="inspectorSection truthBlock"><SealCheck aria-hidden="true" /><p>{artifact.manifest.disclosure}</p></div></>;
 }
 
-function OfferingPanel({ artifact, offering, address, setAddress, resolution, setResolution, expression, setExpression, permissions, setPermissions, compileOffering, busy }: { artifact:CompiledStudioArtifact; offering?:OfferingPackageV0_2; address:Address; setAddress:(value:Address)=>void; resolution:Resolution; setResolution:(value:Resolution)=>void; expression:ExpressionProfileV0_2; setExpression:React.Dispatch<React.SetStateAction<ExpressionProfileV0_2>>; permissions:OfferingPermissionsV0_2; setPermissions:React.Dispatch<React.SetStateAction<OfferingPermissionsV0_2>>; compileOffering:()=>void; busy:boolean }) {
+function OfferingPanel({ artifact, offering, address, setAddress, resolution, setResolution, expression, setExpression, confirmed, setConfirmed, invalidateOffering, compileOffering, busy }: { artifact:CompiledStudioArtifact; offering?:GoverningOfferingPackage; address:Address; setAddress:(value:Address)=>void; resolution:Resolution; setResolution:(value:Resolution)=>void; expression:ExpressionProfileV0_2; setExpression:React.Dispatch<React.SetStateAction<ExpressionProfileV0_2>>; confirmed:boolean; setConfirmed:(value:boolean)=>void; invalidateOffering:()=>void; compileOffering:()=>void; busy:boolean }) {
   void artifact;
-  return <><PanelHeading eyebrow="OWNER DECISIONS 06–07" title="Offering Canvas"><p>Expression can change finish and tempo. Address turns the whole form. Neither may rewrite the Fold.</p></PanelHeading><div className="inspectorSection"><h3>Resolution R0–R5</h3><div className="resolutionRail">{RESOLUTIONS.map((item) => <button key={item.id} data-selected={resolution === item.id} onClick={() => setResolution(item.id)}><span>{item.id}</span><strong>{item.label}</strong><small>{item.description}</small></button>)}</div></div><div className="inspectorSection offeringFields"><label>Finish<select value={expression.finish} onChange={(event) => setExpression((previous) => ({ ...previous, finish:event.target.value as ExpressionProfileV0_2["finish"] }))}><option value="archive">Archive</option><option value="metal">Metal</option><option value="moonlit">Moonlit</option></select></label><label>Temperament<select value={expression.temperament} onChange={(event) => setExpression((previous) => ({ ...previous, temperament:event.target.value as ExpressionProfileV0_2["temperament"] }))}><option value="tender">Tender</option><option value="solemn">Solemn</option><option value="ceremonial">Ceremonial</option></select></label><label className="wideField">Dedication<input value={expression.dedication} onChange={(event) => setExpression((previous) => ({ ...previous, dedication:event.target.value }))} /></label></div><div className="inspectorSection"><h3>Address</h3><div className="addressRail">{ADDRESSES.map((item) => <button key={item} data-selected={address === item} onClick={() => setAddress(item)}>{item}</button>)}</div></div><div className="inspectorSection permissionGrid">{Object.entries(permissions).map(([key,value]) => <label key={key}><input type="checkbox" checked={value} onChange={(event) => setPermissions((previous) => ({ ...previous, [key]:event.target.checked }))} /><span>{key.replace(/([A-Z])/g," $1")}</span></label>)}</div><div className="inspectorSection exactPreview"><h3>Exact recipient Preview</h3>{offering ? <><div className="previewStage">{offering.recipientScene ? <FormStage scene={offering.recipientScene} reducedMotion /> : <div className="resolutionMark"><span>{offering.resolution}</span><strong>{offering.title}</strong></div>}</div><dl className="microLedger"><div><dt>Package</dt><dd>{offering.packageHash.slice(0,12)}</dd></div><div><dt>Record</dt><dd>{offering.recipientRecord.length} visible</dd></div></dl><Link className="instrumentPrimary" href={`/w/${offering.offeringId}`}>Open exact Witness <ArrowRight aria-hidden="true" /></Link></> : <p className="emptyPanel">Compile to serialize the same package consumed by Preview and Witness.</p>}</div><div className="inspectorAction"><button className="instrumentPrimary" disabled={busy} onClick={compileOffering}>{busy ? "Compiling…" : `Prepare ${resolution} Offering locally`} <ArrowRight aria-hidden="true" /></button><small>No sending or delivery is claimed.</small></div></>;
+  const rank = Number(resolution.slice(1));
+  return <><PanelHeading eyebrow="OWNER DECISIONS 06–07" title="Offering Canvas"><p>Expression can change finish and tempo. Address turns the whole form. Neither may rewrite the Fold.</p></PanelHeading><div className="inspectorSection"><h3>Resolution R0–R5</h3><div className="resolutionRail">{RESOLUTIONS.map((item) => <button key={item.id} data-selected={resolution === item.id} onClick={() => { invalidateOffering(); setResolution(item.id); }}><span>{item.id}</span><strong>{item.label}</strong><small>{item.description}</small></button>)}</div></div><div className="inspectorSection offeringFields"><label>Finish<select value={expression.finish} onChange={(event) => { invalidateOffering(); setExpression((previous) => ({ ...previous, finish:event.target.value as ExpressionProfileV0_2["finish"] })); }}><option value="archive">Archive</option><option value="metal">Metal</option><option value="moonlit">Moonlit</option></select></label><label>Temperament<select value={expression.temperament} onChange={(event) => { invalidateOffering(); setExpression((previous) => ({ ...previous, temperament:event.target.value as ExpressionProfileV0_2["temperament"] })); }}><option value="tender">Tender</option><option value="solemn">Solemn</option><option value="ceremonial">Ceremonial</option></select></label><label className="wideField">Dedication<input value={expression.dedication} onChange={(event) => { invalidateOffering(); setExpression((previous) => ({ ...previous, dedication:event.target.value })); }} /></label></div><div className="inspectorSection"><h3>Address</h3><div className="addressRail">{ADDRESSES.map((item) => <button key={item} data-selected={address === item} onClick={() => { invalidateOffering(); setAddress(item); }}>{item}</button>)}</div></div><div className="inspectorSection permissionSummary"><h3>Disclosure fixed by {resolution}</h3><ul><li data-permitted={rank >= 1}>Bounded record {rank >= 1 ? "included" : "withheld"}</li><li data-permitted={rank >= 2}>Fold {rank >= 2 ? "included" : "withheld"}</li><li data-permitted={rank >= 3}>Semantic inspection {rank >= 3 ? "included" : "withheld"}</li><li data-permitted={rank >= 4}>Becoming replay {rank >= 4 ? "included" : "withheld"}</li><li data-permitted={rank >= 5}>Local demonstration Return {rank >= 5 ? "included" : "withheld"}</li><li>Sound and successor use withheld in every resolution</li></ul></div><div className="inspectorSection offeringConfirmation"><label><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I confirm that I have the right to offer this exact projection to this Address.</span></label></div><div className="inspectorSection exactPreview"><h3>Exact recipient Preview</h3>{offering ? <><div className="previewStage">{offering.projection.scene ? <FormStage scene={offering.projection.scene} reducedMotion /> : <div className="resolutionMark"><span>{offering.projection.permissions.resolution}</span><strong>{offering.offering.title}</strong></div>}</div><dl className="microLedger"><div><dt>Package</dt><dd>{offering.packageHash.slice(0,12)}</dd></div><div><dt>Record</dt><dd>{offering.projection.record.length} visible</dd></div></dl><Link className="instrumentPrimary" href={`/w/${offering.offering.offeringId}`}>Open exact Local Preview <ArrowRight aria-hidden="true" /></Link></> : <p className="emptyPanel">Confirm, then serialize the same governing package consumed by Preview and Witness.</p>}</div><div className="inspectorAction"><button className="instrumentPrimary" disabled={busy || !confirmed} onClick={compileOffering}>{busy ? "Compiling…" : `Prepare ${resolution} Offering locally`} <ArrowRight aria-hidden="true" /></button><small>No sending or delivery is claimed.</small></div></>;
 }
 
-function ReturnsPanel({ returns, successors, onDisposition }: { returns:ReturnCandidateV0_1[]; successors:SuccessorStudyV0_1[]; onDisposition:(candidate:ReturnCandidateV0_1, disposition:"hold_at_rest"|"dock_to_successor"|"archive_mark"|"reject")=>void }) {
-  return <><PanelHeading eyebrow="LOCAL RETURN REVIEW" title="Returns"><p>Review a browser-local candidate and simulate an owner disposition. Nothing here is remote, received, accepted, released or sealed.</p></PanelHeading><div className="inspectorSection">{returns.length ? returns.map((candidate) => <article className="returnReview" key={candidate.returnId}><span>{candidate.returnId}</span><blockquote>{candidate.exactText}</blockquote><small>Muse reuse {candidate.mayBecomeMuse ? "permitted" : "denied"} · withdrawal {candidate.withdrawalAllowed ? "allowed" : "not offered"}</small><div className="returnDisposition"><button onClick={() => onDisposition(candidate,"dock_to_successor")}>Dock to successor</button><button onClick={() => onDisposition(candidate,"hold_at_rest")}>Hold at rest</button><button onClick={() => onDisposition(candidate,"archive_mark")}>Archive mark</button><button onClick={() => onDisposition(candidate,"reject")}>Reject</button></div></article>) : <div className="emptyPanel"><CircleNotch aria-hidden="true" /><p>No local Return candidate is visible for this Offering yet. Open the Witness and fold one there.</p></div>}</div>{successors.length ? <div className="inspectorSection"><h3>Successor dock</h3>{successors.map((successor) => <div className="successorRow" key={successor.successorId}><GitFork aria-hidden="true" /><div><strong>{successor.successorId}</strong><small>{successor.returnId} · prototype_only</small></div></div>)}</div> : null}</>;
+function ReturnsPanel({ returns, successors, onDisposition }: { returns:ReturnCandidateV0_1[]; successors:SuccessorStudyV0_1[]; onDisposition:(candidate:ReturnCandidateV0_1, disposition:"hold_at_rest"|"archive_mark"|"reject")=>void }) {
+  return <><PanelHeading eyebrow="LOCAL DEMONSTRATION REVIEW" title="Returns"><p>These browser-local notes are not observed recipient Returns and cannot become evidence, Muses, or successor material.</p></PanelHeading><div className="inspectorSection">{returns.length ? returns.map((candidate) => <article className="returnReview" key={candidate.returnId}><span>{candidate.returnId}</span><blockquote>{candidate.exactText}</blockquote><small>LOCAL DEMONSTRATION · SUCCESSOR CONSIDERATION NOT PERMITTED</small><div className="returnDisposition"><button onClick={() => onDisposition(candidate,"hold_at_rest")}>Leave OPEN</button><button onClick={() => onDisposition(candidate,"archive_mark")}>Mark as demonstration</button><button onClick={() => onDisposition(candidate,"reject")}>Reject</button></div></article>) : <div className="emptyPanel"><CircleNotch aria-hidden="true" /><p>No local demonstration Return is visible for this Offering yet.</p></div>}</div>{successors.length ? <div className="inspectorSection"><h3>Read-only legacy metadata</h3>{successors.map((successor) => <div className="successorRow" key={successor.successorId}><GitFork aria-hidden="true" /><div><strong>{successor.successorId}</strong><small>Retained for export only · no successor authority</small></div></div>)}</div> : null}</>;
 }

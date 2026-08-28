@@ -4,6 +4,8 @@
 node_modules
 playwright-report
 test-results
+output
+.playwright-cli
 coverage
 .DS_Store
 .env*

@@ -1,44 +1,57 @@
-import { test } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
+import { expect, test, type Page } from "@playwright/test";
 
-test("capture public site and Sketches design evidence", async ({ page }) => {
-  await page.setViewportSize({ width:1440, height:900 });
+const output = "output/playwright/public-door-v02";
+
+async function capture(page: Page, name: string, viewport: { width:number; height:number }, action?:() => Promise<void>) {
+  await page.setViewportSize(viewport);
+  if (action) await action();
+  await page.waitForTimeout(250);
+  await page.screenshot({ path:`${output}/${name}.png`, fullPage:false });
+}
+
+test("freeze the five browser-native keyframe pairs", async ({ page }) => {
+  await mkdir(output, { recursive:true });
+  const desktop = { width:1440, height:900 };
+  const mobile = { width:390, height:844 };
+
   await page.goto("/");
-  await page.screenshot({ path:"evidence/qa/public-site-v02-bet-desktop.png", fullPage:true });
+  await expect(page.locator('[data-form-ready="true"]')).toBeVisible();
+  await page.waitForTimeout(1600);
+  await capture(page,"01-door-object-desktop",desktop);
+  await capture(page,"01-door-object-mobile",mobile);
+  await capture(page,"01-door-invitation-desktop",desktop,async()=>{await page.locator(".doorInvitation").scrollIntoViewIfNeeded();await page.evaluate(()=>scrollBy(0,-74));});
+  await capture(page,"01-door-invitation-mobile",mobile,async()=>{await page.locator(".doorInvitation").scrollIntoViewIfNeeded();await page.evaluate(()=>scrollBy(0,-58));});
 
-  await page.goto("/science");
-  await page.screenshot({ path:"evidence/qa/public-site-v02-science-desktop.png", fullPage:true });
+  await page.goto("/works");
+  await capture(page,"02-works-desktop",desktop);
+  await capture(page,"02-works-mobile",mobile);
+  await page.goto("/works/genesis");
+  await expect(page.locator('[data-form-ready="true"]')).toBeVisible();
+  await capture(page,"02-genesis-desktop",desktop);
+  await capture(page,"02-genesis-mobile",mobile);
 
-  await page.goto("/sketches");
-  await page.locator('[data-form-ready="true"]').first().waitFor();
-  await page.screenshot({ path:"evidence/qa/public-site-v02-sketches-desktop.png", fullPage:true });
+  await page.goto("/works/genesis?view=becoming");
+  await page.getByRole("button",{name:"04",exact:true}).click();
+  await page.evaluate(()=>scrollTo(0,0));
+  await capture(page,"03-becoming-desktop",desktop);
+  await capture(page,"03-becoming-mobile",mobile);
 
-  await page.setViewportSize({ width:1920, height:1311 });
-  await page.goto("/sketches/pcn-0002");
-  await page.locator('[data-form-ready="true"]').waitFor();
-  await page.getByRole("tab", { name:"Record" }).click();
-  await page.waitForTimeout(700);
-  await page.screenshot({ path:"evidence/qa/public-site-v02-record-desktop.png" });
+  await page.goto("/studio/specimens/pcn-0001");
+  await expect(page.locator('[data-form-ready="true"]')).toBeVisible();
+  await capture(page,"04-studio-desktop",desktop);
+  await capture(page,"04-studio-mobile",mobile);
+  await page.getByRole("tab",{name:"Offering"}).click();
+  await page.getByRole("button",{name:/R5 Recital/}).click();
+  await capture(page,"04-offering-desktop",desktop);
+  await capture(page,"04-offering-mobile",mobile);
 
-  await page.getByRole("tab", { name:"Becoming" }).click();
-  await page.getByRole("button", { name:"04" }).first().click();
-  await page.waitForTimeout(300);
-  await page.screenshot({ path:"evidence/qa/public-site-v02-becoming-desktop.png" });
-
-  await page.getByRole("tab", { name:"Offering" }).click();
-  await page.waitForTimeout(300);
-  await page.screenshot({ path:"evidence/qa/public-site-v02-offering-desktop.png" });
-
-  await page.setViewportSize({ width:390, height:844 });
-  await page.goto("/");
-  await page.screenshot({ path:"evidence/qa/public-site-v02-bet-mobile.png", fullPage:true });
-
-  await page.goto("/sketches");
-  await page.locator('[data-form-ready="true"]').first().waitFor();
-  await page.screenshot({ path:"evidence/qa/public-site-v02-sketches-mobile.png", fullPage:true });
-
-  await page.goto("/sketches/pcn-0001");
-  await page.locator('[data-form-ready="true"]').waitFor();
-  await page.getByRole("tab", { name:"Record" }).click();
-  await page.waitForTimeout(500);
-  await page.screenshot({ path:"evidence/qa/public-site-v02-record-mobile.png" });
+  await page.goto("/w/genesis-demonstration");
+  await expect(page.getByRole("button",{name:"Open demonstration"})).toBeVisible();
+  await capture(page,"05-locket-desktop",desktop);
+  await capture(page,"05-locket-mobile",mobile);
+  await page.getByRole("button",{name:"Open demonstration"}).click();
+  await page.getByRole("button",{name:"Skip to the settled Encounter"}).click();
+  await capture(page,"05-encounter-desktop",desktop);
+  await capture(page,"05-encounter-mobile",mobile,async()=>page.locator(".recipientReturn").scrollIntoViewIfNeeded());
 });

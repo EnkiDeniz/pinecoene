@@ -6,6 +6,7 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; media-src 'none'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'" },
 ];
 
 const nextConfig: NextConfig = {
@@ -16,19 +17,11 @@ const nextConfig: NextConfig = {
   async headers() {
     const noindex = { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" };
     return [
-      { source: "/:path*", headers: securityHeaders },
-      { source: "/master", headers: [noindex] },
-      { source: "/theorem", headers: [noindex] },
-      { source: "/sketches/:path+", headers: [noindex] },
-      { source: "/w/:path+", headers: [noindex] },
+      { source: "/:path*", headers: [...securityHeaders,noindex] },
     ];
   },
   async redirects() {
     return [
-      { source: "/studio", destination: "/sketches", statusCode: 301 },
-      { source: "/studio/:id", destination: "/sketches/:id", statusCode: 301 },
-      { source: "/make", destination: "/use", statusCode: 301 },
-      { source: "/vital-sign", destination: "/sketches/vital-sign", statusCode: 301 },
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.pinecoene.com" }],

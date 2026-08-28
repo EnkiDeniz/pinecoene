@@ -49,6 +49,8 @@ export class PinecoeneFormElement extends LitElement {
   private root?: THREE.Group;
   private frame?: number;
   private resizeObserver?: ResizeObserver;
+  private intersectionObserver?: IntersectionObserver;
+  private visible = true;
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private pointerDown?: { x: number; y: number; rotationX: number; rotationY: number };
@@ -99,6 +101,8 @@ export class PinecoeneFormElement extends LitElement {
     super.disconnectedCallback();
     cancelAnimationFrame(this.frame ?? 0);
     this.resizeObserver?.disconnect();
+    this.intersectionObserver?.disconnect();
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
     this.clearRoot();
     this.renderer?.dispose();
   }
@@ -130,8 +134,14 @@ export class PinecoeneFormElement extends LitElement {
     this.addEventListener("keydown", this.onKeyDown);
     this.resizeObserver = new ResizeObserver(this.resize);
     this.resizeObserver.observe(this);
+    this.intersectionObserver = new IntersectionObserver(([entry]) => {
+      this.visible = entry?.isIntersecting ?? false;
+      if (this.visible) this.scheduleFrame();
+    }, { rootMargin:"160px" });
+    this.intersectionObserver.observe(this);
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
     this.resize();
-    this.renderFrame();
+    this.scheduleFrame();
   }
 
   private rebuild() {
@@ -298,10 +308,19 @@ export class PinecoeneFormElement extends LitElement {
     this.camera.updateProjectionMatrix();
   };
 
+  private onVisibilityChange = () => { if (!document.hidden) this.scheduleFrame(); };
+
+  private scheduleFrame = () => {
+    if (this.frame !== undefined || !this.visible || document.hidden) return;
+    this.frame = requestAnimationFrame(this.renderFrame);
+  };
+
   private renderFrame = () => {
+    this.frame = undefined;
+    if (!this.visible || document.hidden) return;
     if (this.root && this.autoRotate && !this.reducedMotion && !this.pointerDown) this.root.rotation.y += 0.00075;
     if (this.renderer && this.scene && this.camera) this.renderer.render(this.scene,this.camera);
-    this.frame = requestAnimationFrame(this.renderFrame);
+    this.scheduleFrame();
   };
 }
 

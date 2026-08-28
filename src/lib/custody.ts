@@ -10,6 +10,7 @@ import type {
   SessionStudyV0_1,
   SuccessorStudyV0_1,
 } from "@/lib/studio-contracts";
+import { verifyGoverningOfferingPackage, type GoverningOfferingPackage } from "@/lib/offering-v01";
 
 interface SavedPinecoene {
   id: string;
@@ -27,6 +28,21 @@ interface SavedReturn {
   savedAt: string;
 }
 
+interface SavedRecipientPackage {
+  offeringId:string;
+  packageHash:string;
+  savedAt:string;
+  package:GoverningOfferingPackage;
+}
+
+interface PortableTransferReceiptV0_1 {
+  receiptId:string;
+  offeringId:string;
+  packageHash:string;
+  observedAt:string;
+  evidenceKind:"portable_file_import";
+}
+
 class PinecoeneCustody extends Dexie {
   pinecoenes!: EntityTable<SavedPinecoene, "id">;
   returns!: EntityTable<SavedReturn, "id">;
@@ -35,6 +51,8 @@ class PinecoeneCustody extends Dexie {
   returnCandidates!: EntityTable<ReturnCandidateV0_1, "returnId">;
   returnDispositions!: EntityTable<ReturnDispositionV0_1, "returnId">;
   successors!: EntityTable<SuccessorStudyV0_1, "successorId">;
+  recipientPackages!: EntityTable<SavedRecipientPackage,"offeringId">;
+  portableTransferReceipts!: EntityTable<PortableTransferReceiptV0_1,"receiptId">;
 
   constructor() {
     super("pinecoene-showcase-v0");
@@ -50,6 +68,17 @@ class PinecoeneCustody extends Dexie {
       returnCandidates: "returnId, offeringId, candidateHash, createdAt",
       returnDispositions: "returnId, disposition, decidedAt",
       successors: "successorId, predecessorStudyId, returnId, createdAt",
+    });
+    this.version(3).stores({
+      pinecoenes: "id, updatedAt",
+      returns: "id, offeringId, savedAt",
+      studies: "studyId, fixtureId, fixtureHash, updatedAt",
+      offeringsV2: "offeringId, fixtureId, studyId, packageHash",
+      returnCandidates: "returnId, offeringId, candidateHash, createdAt",
+      returnDispositions: "returnId, disposition, decidedAt",
+      successors: "successorId, predecessorStudyId, returnId, createdAt",
+      recipientPackages: "offeringId, packageHash, savedAt",
+      portableTransferReceipts: "receiptId, offeringId, packageHash, observedAt",
     });
   }
 }
@@ -100,6 +129,22 @@ export async function deleteStudy(studyId: string) {
 export async function saveOfferingV2(offering: OfferingPackageV0_2) {
   await getCustody().offeringsV2.put(offering);
   return offering;
+}
+
+export async function saveRecipientPackage(value:unknown){
+  const verified=await verifyGoverningOfferingPackage(value);
+  const hostedIds=new Set(["genesis-demonstration"]);
+  if(hostedIds.has(verified.offering.offeringId))throw new Error("A local package cannot use a hosted Offering ID.");
+  await getCustody().recipientPackages.put({offeringId:verified.offering.offeringId,packageHash:verified.packageHash,savedAt:new Date().toISOString(),package:verified});
+  return verified;
+}
+
+export async function loadRecipientPackage(offeringId:string){
+  const saved=await getCustody().recipientPackages.get(offeringId);
+  if(!saved)return undefined;
+  await verifyGoverningOfferingPackage(saved.package);
+  if(saved.package.packageHash!==saved.packageHash||saved.package.offering.offeringId!==offeringId)throw new Error("Recipient package binding failed closed.");
+  return saved.package;
 }
 
 export async function loadOfferingV2(offeringId: string) {
