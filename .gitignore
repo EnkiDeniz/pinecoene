@@ -9,6 +9,7 @@ coverage
 .env*
 !.env.example
 concept/
+private/
 npm-debug.log*
 pnpm-debug.log*
 *.tsbuildinfo
