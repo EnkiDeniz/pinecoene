@@ -1,4 +1,9 @@
 import { test } from "@playwright/test";
+import { unlockBeta } from "./beta-access";
+
+test.beforeEach(async ({ page }) => {
+  await unlockBeta(page);
+});
 
 test("capture public site and Sketches design evidence", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });

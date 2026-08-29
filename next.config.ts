@@ -6,6 +6,7 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
 ];
 
 const nextConfig: NextConfig = {
@@ -14,15 +15,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   async headers() {
-    const noindex = { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" };
     return [
       { source: "/:path*", headers: securityHeaders },
-      { source: "/master", headers: [noindex] },
-      { source: "/theorem", headers: [noindex] },
-      { source: "/demo", headers: [noindex] },
-      { source: "/demo/:path*", headers: [noindex] },
-      { source: "/sketches/:path+", headers: [noindex] },
-      { source: "/w/:path+", headers: [noindex] },
     ];
   },
   async redirects() {

@@ -1,7 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { unlockBeta } from "./beta-access";
 
 test.beforeEach(async ({ page }) => {
+  await unlockBeta(page);
   page.on("pageerror", (error) => console.error("BROWSER_PAGE_ERROR", error.message));
   page.on("console", (message) => { if (message.type() === "error") console.error("BROWSER_CONSOLE_ERROR", message.text()); });
 });
@@ -92,11 +94,11 @@ test("legacy routes issue exact permanent redirects", async ({ request }) => {
   }
 });
 
-test("selective indexing is consistent across metadata, headers, robots, and sitemap", async ({ page, request }) => {
+test("private beta indexing is consistently closed", async ({ page, request }) => {
   for (const route of ["/", "/approach", "/science", "/sketches", "/use"]) {
     const response = await page.goto(route);
-    expect(response?.headers()["x-robots-tag"] ?? "", route).not.toContain("noindex");
-    await expect(page.locator('meta[name="robots"]')).not.toHaveAttribute("content", /noindex/i);
+    expect(response?.headers()["cache-control"], route).toContain("no-store");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex.*nofollow/i);
   }
   for (const route of ["/master", "/theorem", "/sketches/pcn-0001", "/w/pcn-0002", "/sketches/vital-sign"]) {
     const response = await page.goto(route);
@@ -104,12 +106,7 @@ test("selective indexing is consistent across metadata, headers, robots, and sit
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex.*nofollow/i);
   }
   const robots = await (await request.get("/robots.txt")).text();
-  expect(robots).toContain("Allow: /science");
-  expect(robots).toContain("Disallow: /w/");
-  const sitemap = await (await request.get("/sitemap.xml")).text();
-  expect(sitemap).toContain("https://pinecoene.com/science");
-  expect(sitemap).not.toContain("/master");
-  expect(sitemap).not.toContain("/w/");
+  expect(robots).toContain("Disallow: /");
 });
 
 test("candidate documents cannot impersonate canonical sources", async ({ page }) => {

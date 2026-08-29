@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/newsreader";
 import "./globals.css";
+import "./beta-gate.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pinecoene.com"),
@@ -12,7 +13,12 @@ export const metadata: Metadata = {
   description:
     "Pinecœne is a receipt-bound format for inquiry: a work can preserve how it became, become a form, travel by consent, and grow without rewriting its past.",
   applicationName: "Pinecœne",
-  robots: { index: true, follow: true },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false, noimageindex: true },
+  },
   openGraph: {
     type: "website",
     title: "Pinecœne",
